@@ -1,0 +1,16 @@
+{
+  "name": "com.damdor.injectio",
+  "version": "1.0.0",
+  "displayName": "Injectio",
+  "description": "",
+  "unity": "2022.3",
+  "publishConfig": {
+    "registry": "https://upm.pckgs.io"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/damdordev/Injectio.git"
+  },
+  "dependencies": { 
+  } 
+}
