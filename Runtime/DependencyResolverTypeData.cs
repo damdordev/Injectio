@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Damdor.Injectio
 {
-    internal class DependencyResolverFieldData
+    public class DependencyResolverFieldData
     {
         public FieldInfo Field { get; }
         
@@ -16,7 +15,7 @@ namespace Damdor.Injectio
         }
     }
 
-    internal class DependencyResolverPropertyData
+    public class DependencyResolverPropertyData
     {
         public PropertyInfo Property { get; }
 
@@ -26,38 +25,47 @@ namespace Damdor.Injectio
         }
     }
 
-    internal class DependencyResolverMethodData
+    public class DependencyResolverMethodData
     {
         public MethodInfo Method { get; }
-        public List<Type> Parameters { get; }
+        public Type[] Parameters { get; }
 
         public DependencyResolverMethodData(MethodInfo method, ParameterInfo[] parameters)
         {
             Method = method;
-            Parameters = parameters.Select(parameter => parameter.ParameterType).ToList();
+            
+            Parameters = new Type[parameters.Length];
+            for (var i = 0; i < parameters.Length; i++)
+            {
+                Parameters[i] = parameters[i].ParameterType;
+            }
         }
     }
 
-    internal class DependencyResolverTypeData
+    public class DependencyResolverTypeData
     {
-        public List<DependencyResolverFieldData> Fields { get; } = new();
-        public List<DependencyResolverPropertyData> Properties { get; } = new();
-        public List<DependencyResolverMethodData> Methods { get; } = new();
+        public IReadOnlyList<DependencyResolverFieldData> Fields { get; }
+        public IReadOnlyList<DependencyResolverPropertyData> Properties { get; }
+        public IReadOnlyList<DependencyResolverMethodData> Methods { get; }
 
         public DependencyResolverTypeData(Type type)
         {
+            var fields = new List<DependencyResolverFieldData>();
+            var properties = new List<DependencyResolverPropertyData>();
+            var methods = new List<DependencyResolverMethodData>();
+
             const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
 
             foreach (var field in type.GetFields(flags))
             {
                 if(field.FieldType.IsValueType || !HasInjectAttribute(field)) continue;
-                Fields.Add(new DependencyResolverFieldData(field));
+                fields.Add(new DependencyResolverFieldData(field));
             }
             
             foreach (var property in type.GetProperties(flags))
             {
                 if(property.PropertyType.IsValueType || !property.CanWrite || !HasInjectAttribute(property)) continue;
-                Properties.Add(new DependencyResolverPropertyData(property));
+                properties.Add(new DependencyResolverPropertyData(property));
             }
 
             foreach (var method in type.GetMethods(flags))
@@ -65,8 +73,13 @@ namespace Damdor.Injectio
                 if (!HasInjectAttribute(method)) continue;
                 var parameters = method.GetParameters();
                 if(!AreAllParametersOfReferenceType(parameters)) continue;
-                Methods.Add(new DependencyResolverMethodData(method, parameters));
+                methods.Add(new DependencyResolverMethodData(method, parameters));
             }
+
+            // .ToArray() reclaims internal buffer capacity left-over from using List
+            Fields = fields;
+            Properties = properties;
+            Methods = methods;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

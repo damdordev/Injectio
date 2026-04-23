@@ -53,7 +53,7 @@ namespace Damdor.Injectio
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Resolve(IDependencyContainer container, DependencyResolverMethodData method, object target)
         {
-            var parameterArray = GetParameterArray(method.Parameters.Count);
+            var parameterArray = GetParameterArray(method.Parameters.Length);
 
             try
             {
@@ -82,17 +82,19 @@ namespace Damdor.Injectio
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static object[] GetParameterArray(int parameterCount)
         {
-            if (!parameters.TryGetValue(parameterCount, out var p))
+            if (parameters.TryGetValue(parameterCount, out var p))
             {
-                p = new Stack<object[]>();
-                parameters[parameterCount] = p;
+                return p.Count > 0 ? p.Pop() : new object[parameterCount];
             }
+
+            p = new Stack<object[]>();
+            parameters[parameterCount] = p;
 
             return p.Count > 0 ? p.Pop() : new object[parameterCount];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void FillParameterArray(IDependencyContainer container, List<Type> parameters, object[] parameterArray)
+        private static void FillParameterArray(IDependencyContainer container, Type[] parameters, object[] parameterArray)
         {
             for (var i = 0; i < parameterArray.Length; i++)
             {
