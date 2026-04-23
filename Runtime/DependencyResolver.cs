@@ -5,11 +5,20 @@ using UnityEngine.Pool;
 
 namespace Damdor.Injectio
 {
+    /// <summary>
+    /// A static utility class responsible for resolving and injecting dependencies into target objects.
+    /// It caches reflection data to minimize allocations and uses pooling for method parameters.
+    /// </summary>
     public static class DependencyResolver
     {
         private static readonly Dictionary<Type, DependencyResolverTypeData> typeToData = new();
         private static readonly Dictionary<int, Stack<object[]>> parameters = new();
 
+        /// <summary>
+        /// Resolves and injects dependencies into the specified target object using the provided dependency container.
+        /// </summary>
+        /// <param name="container">The dependency container used to resolve required types.</param>
+        /// <param name="target">The target object to inject dependencies into.</param>
         public static void Resolve(IDependencyContainer container, object target)
         {
             if (container == null || target == null) return;
