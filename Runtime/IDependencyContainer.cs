@@ -1,6 +1,6 @@
 using System;
 
-namespace DefaultNamespace
+namespace Damdor.Injectio
 {
     public interface IDependencyContainer
     {

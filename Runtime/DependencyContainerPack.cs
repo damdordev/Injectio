@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace DefaultNamespace
+namespace Damdor.Injectio
 {
     public class DependencyContainerPack : IDependencyContainer
     {
