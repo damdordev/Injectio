@@ -5,11 +5,19 @@ using UnityEngine.Pool;
 
 namespace Damdor.Injectio
 {
+    /// <summary>
+    /// A static utility class responsible for exporting and registering dependencies from source objects.
+    /// It caches reflection data to minimize allocations.
+    /// </summary>
     public static class DependencyExporter
     {
         private static readonly Dictionary<Type, DependencyExporterTypeData> typeToData = new();
-        private static readonly Dictionary<int, Stack<object[]>> parameters = new();
 
+        /// <summary>
+        /// Exports and registers dependencies from the specified source object into the provided dependency register.
+        /// </summary>
+        /// <param name="register">The dependency register used to store exported types.</param>
+        /// <param name="source">The source object from which to export dependencies.</param>
         public static void Export(IDependencyRegister register, object source)
         {
             if (register == null || source == null) return;
@@ -41,10 +49,10 @@ namespace Damdor.Injectio
         private static void Export(IDependencyRegister register, DependencyExporterFieldData field, object target)
         {
             var value = field.Field.GetValue(target);
+            if (value == null) return;
+
             var attribute = field.Attribute;
-            if(value == null) return;
-            
-            if(attribute.RegisterType == null) register.Register(value);
+            if (attribute.RegisterType == null) register.Register(value.GetType(), value);
             else register.Register(attribute.RegisterType, value);
         }
         
@@ -52,10 +60,10 @@ namespace Damdor.Injectio
         private static void Export(IDependencyRegister register, DependencyExporterPropertyData property, object target)
         {
             var value = property.Property.GetValue(target);
+            if (value == null) return;
+
             var attribute = property.Attribute;
-            if(value == null) return;
-            
-            if(attribute.RegisterType == null) register.Register(value);
+            if (attribute.RegisterType == null) register.Register(value.GetType(), value);
             else register.Register(attribute.RegisterType, value);
         }
         

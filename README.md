@@ -8,10 +8,13 @@ Injectio is a lightweight, fast, and simple Dependency Injection (DI) framework.
 - [Core concepts](#core-concepts)
   - [IDependencyContainer](#idependencycontainer)
   - [InjectAttribute](#injectattribute)
+  - [ExportAttribute](#exportattribute)
   - [DependencyResolver](#dependencyresolver)
+  - [DependencyExporter](#dependencyexporter)
 - [Simple usage](#simple-usage)
   - [Create DependencyContainer](#create-dependencycontainer)
   - [Put dependency in container](#put-dependency-in-container)
+  - [Export dependency to container](#export-dependency-to-container)
   - [Create class with dependency attribute](#create-class-with-dependency-attribute)
   - [Resolve dependencies](#resolve-dependencies)
   - [Use interfaces instead of class](#use-interfaces-instead-of-class)
@@ -31,6 +34,7 @@ Injectio is a lightweight, fast, and simple Dependency Injection (DI) framework.
 
 * Lightweight and minimal API
 * Support for Field, Property, and Method injection
+* Support for exporting dependencies via `[Export]` and `DependencyExporter`
 * Extensible container abstraction (`IDependencyContainer`)
 * Container packs for combining multiple containers (`DependencyContainerPack`)
 * Fast reflection-based resolution
@@ -43,8 +47,14 @@ An abstraction representing a source of dependencies. You can register dependenc
 ## InjectAttribute
 An attribute used to mark fields, properties, or methods that need dependencies injected.
 
+## ExportAttribute
+An attribute used to mark fields or properties for exporting dependencies into an `IDependencyRegister`.
+
 ## DependencyResolver
 The core engine that scans a target object for members marked with `[Inject]` and resolves their values using a given `IDependencyContainer`.
+
+## DependencyExporter
+A utility that scans a source object for members marked with `[Export]` and registers their values into a given `IDependencyRegister`.
 
 # Simple usage
 
@@ -57,6 +67,23 @@ var container = new DependencyContainer();
 ```csharp
 var myService = new MyService();
 container.Register(myService);
+```
+
+## Export dependency to container
+You can also use `DependencyExporter` along with `[Export]` to automatically register fields and properties from an object into an `IDependencyRegister` (e.g. `DependencyContainer`).
+```csharp
+public class ServiceProvider
+{
+    [Export]
+    private MyService myService = new MyService();
+
+    [Export(typeof(IMyOtherService))]
+    public MyOtherService OtherService { get; } = new MyOtherService();
+}
+
+var provider = new ServiceProvider();
+DependencyExporter.Export(container, provider);
+// container now has MyService and IMyOtherService registered!
 ```
 
 ## Create class with dependency attribute
@@ -76,7 +103,7 @@ public class MyConsumer
 ## Resolve dependencies
 ```csharp
 var consumer = new MyConsumer();
-DependencyResolver.Resolve(consumer, container);
+DependencyResolver.Resolve(container, consumer);
 // consumer.myService is now populated!
 ```
 
@@ -144,7 +171,7 @@ var localContainer = new DependencyContainer();
 var pack = new DependencyContainerPack(localContainer, globalContainer);
 
 // Resolves by checking localContainer first, then globalContainer
-DependencyResolver.Resolve(target, pack);
+DependencyResolver.Resolve(pack, target);
 ```
 
 Container added last has the highest priority.
