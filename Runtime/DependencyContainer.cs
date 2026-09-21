@@ -8,7 +8,7 @@ namespace Damdor.Injectio
     /// Allows registering, removing, and retrieving instances by their type.
     /// Note: Does not support multithreading due to performance reasons.
     /// </summary>
-    public class DependencyContainer : IDependencyContainer
+    public class DependencyContainer : IDependencyContainer, IDependencyRegister
     {
         private readonly Dictionary<Type, object> dependencies = new();
 

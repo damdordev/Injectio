@@ -76,7 +76,6 @@ namespace Damdor.Injectio
                 methods.Add(new DependencyResolverMethodData(method, parameters));
             }
 
-            // .ToArray() reclaims internal buffer capacity left-over from using List
             Fields = fields;
             Properties = properties;
             Methods = methods;
