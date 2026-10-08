@@ -5,6 +5,7 @@ Injectio is a lightweight, fast, and simple Dependency Injection (DI) framework.
 # Table of Contents
 - [Injectio](#injectio)
 - [Features](#features)
+- [Installation](#installation)
 - [Core concepts](#core-concepts)
   - [IDependencyContainer](#idependencycontainer)
   - [InjectAttribute](#injectattribute)
@@ -38,6 +39,22 @@ Injectio is a lightweight, fast, and simple Dependency Injection (DI) framework.
 * Extensible container abstraction (`IDependencyContainer`)
 * Container packs for combining multiple containers (`DependencyContainerPack`)
 * Fast reflection-based resolution
+
+# Installation
+
+This package is currently under development. In the future, it will be available via a UPM registry. For now, you can install it using the Git URL.
+
+**Option A: Install via Package Manager window**
+1. In Unity, open **Window** > **Package Manager**.
+2. Click the **+** button and select **Add package from git URL...**
+3. Enter the following URL and click **Add**:
+   `https://github.com/damdordev/Injectio.git#1.0.0-preview`
+
+**Option B: Install via `manifest.json`**
+Open your project's `Packages/manifest.json` file and add the following line to your `"dependencies"` block:
+```json
+"com.damdor.injectio": "https://github.com/damdordev/Injectio.git#1.0.0-preview"
+```
 
 # Core concepts
 
